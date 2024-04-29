@@ -34,10 +34,15 @@ def cart(request):
     total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
     quantity = sum(cart_item.quantity for cart_item in cart_items)
     
+    tax=(2*total)/100
+    grand_total = total+tax
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
+        'tax': tax,
+        'grand_total': grand_total,
+
     }
     
     return render(request, 'store/cart.html', context)
