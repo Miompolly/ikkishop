@@ -1,14 +1,6 @@
-# orders/admin.py
-
 from django.contrib import admin
-from .models import Order, OrderItem
+from .models import Payment, Order, OrderProduct
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 1
-
-class OrderAdmin(admin.ModelAdmin):
-    inlines = [OrderItemInline]
-
-admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderItem)
+admin.site.register(Payment)
+admin.site.register(Order)
+admin.site.register(OrderProduct)

@@ -63,7 +63,12 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
-            return redirect('home')
+            if all([user.is_admin, user.is_staff, user.is_active, user.is_superadmin]):
+                return redirect('admin:index')
+            elif user.is_admin:
+                return redirect('store')
+            else:
+                return redirect('home')
         else:
             messages.error(request, 'Invalid login credentials')
             return redirect('login')

@@ -8,9 +8,9 @@
     
     <!-- ============================ COMPONENT 1 ================================= -->
     {% if not cart_items %}
-        <h2 class="text-center">Your shopping cart is empty</h2>
+        <h2 class="text-center">Ikarita yawe yo guhaha irimo ubusa</h2>
         <div class="text-center">
-            <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+            <a href="{% url 'store' %}" class="btn btn-primary">Komeza Guhaha</a>
         </div>
     {% else %}
     <div class="row">
@@ -19,9 +19,9 @@
     <table class="table table-borderless table-shopping-cart">
     <thead class="text-muted">
     <tr class="small text-uppercase">
-      <th scope="col">Product</th>
-      <th scope="col" width="120">Quantity</th>
-      <th scope="col" width="120">Price</th>
+      <th scope="col">Ibihahwa</th>
+      <th scope="col" width="120">Umubare</th>
+      <th scope="col" width="120">Igiciro</th>
       <th scope="col" class="text-right" width="200"> </th>
     </tr>
     </thead>
@@ -56,12 +56,12 @@
         </td>
         <td> 
             <div class="price-wrap"> 
-                <var class="price">${{ cart_item.sub_total }}</var> 
+                <var class="price">Rwf {{ cart_item.sub_total }}</var> 
                 <small class="text-muted"> ${{ cart_item.product.price }} each </small> 
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
-        <a href="{% url 'remove_cart_item' cart_item.product.id %}" onclick="return confirm('Are you want to remove this item ?')" class="btn btn-danger"> Remove</a>
+        <a href="{% url 'remove_cart_item' cart_item.product.id %}" onclick="return confirm('Are you want to remove this item ?')" class="btn btn-danger"> Kuraho</a>
         </td>
     </tr>
  
@@ -76,23 +76,23 @@
             <div class="card">
             <div class="card-body">
                 <dl class="dlist-align">
-                  <dt>Total price:</dt>
-                  <dd class="text-right">${{total}}</dd>
+                  <dt>Igiciro cyose:</dt>
+                  <dd class="text-right">Rwf {{total}}</dd>
                 </dl>
                 <dl class="dlist-align">
-                  <dt>Tax:</dt>
-                  <dd class="text-right">${{tax}}</dd>
+                  <dt>Umusoro:</dt>
+                  <dd class="text-right">Rwf {{tax}}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Total:</dt>
-                  <dd class="text-right text-dark b"><strong>${{ grand_total}}</strong></dd>
+                  <dd class="text-right text-dark b"><strong>Rwf {{ grand_total}}</strong></dd>
                 </dl>
                 <hr>
                 <p class="text-center mb-3">
                     <img src="{% static './images/misc/payments.png' %}" height="26">
                 </p>
-                <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Checkout </a>
-                <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
+                <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Genzura </a>
+                <a href="{% url 'store' %}" class="btn btn-light btn-block">Komeza Guhaha</a>
             </div> <!-- card-body.// -->
             </div> <!-- card.// -->
     
