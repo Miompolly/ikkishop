@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home,name='home'),
@@ -28,5 +29,5 @@ urlpatterns = [
     path('cart/',include('carts.urls')),
     path('accounts/',include('accounts.urls')),
     path('orders/', include('orders.urls')),
-
+    path('dashboard/',include('dashboard.urls')),
 ]+static(settings.MEDIA_URL,document_root=MEDIA_ROOT)

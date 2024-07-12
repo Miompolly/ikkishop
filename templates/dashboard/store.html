@@ -1,0 +1,68 @@
+{% extends 'dash_base.html' %}
+
+{% block content %}
+
+<section class="section-conten padding-y bg">
+
+    {% include 'includes/alerts.html' %}
+    <div class="container">
+        <div class="row">
+            {% include 'includes/seller_dashboard_sidebar.html' %}
+            <main class="col-md-9">
+                <section class="section-conten padding-y bg">
+                    <div class="container">
+                        <div class="row">
+                            <main class="col-md-9">
+                                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                                    <h1 class="h2">Our Categories</h1>
+                                    <div class="btn-toolbar mb-2 mb-md-0">
+                                        <div class="btn-group me-2">
+                                            <a href="{% url 'add_category' %}"><button class="btn btn-primary">Add +</button></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <article class="card">
+                                    <div class="table-responsive pl-3 pr-3">
+                                        <!-- Data Table -->
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Image</th>
+                                                    <th>Category Name</th>
+                                                    <th>Description</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for category in categories %}
+                                                <tr>
+                                                    <td>{{ category.id }}</td>
+                                                    <td>
+                                                        {% if category.image %}
+                                                            <img src="{{ category.image.url }}" alt="{{ category.categoryname }}" style="width: 50px; height: auto;">
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ category.categoryname }}</td>
+                                                    <td>{{ category.description }}</td>
+                                                    <td>
+                                                        <a href="{% url 'edit_category' category.id %}" class="btn btn-info">Edit</a>
+                                                        <a href="{% url 'delete_category' category.id %}" class="btn btn-danger">Delete</a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- table-responsive .end// -->
+                                </article> <!-- order-group.// -->
+                            </main>
+                        </div> <!-- row.// -->
+                    </div>
+                </section>
+            </main>
+        </div> <!-- row.// -->
+    </div>
+
+</section>
+
+{% endblock %}

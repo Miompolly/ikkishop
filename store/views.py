@@ -1,11 +1,12 @@
 from django.shortcuts import render,get_object_or_404
-from django.http import HttpRequest,request
 from carts.models import CartItem
 from carts.views import _cart_id
 from category.models import Category
 from .models import Product
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 from django.db.models import Q
+from django.shortcuts import render, get_object_or_404
+from .models import Category
 
 
 # Create your views here.
@@ -63,4 +64,5 @@ def search(request):
         'products': products,
     }
     return render(request, 'store/store.html', context)
+
 

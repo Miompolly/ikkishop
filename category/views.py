@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from store.models import Product, Variation
-from .models import Cart, CartItem
+from .models import Cart, CartItem, Category
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
@@ -214,3 +214,9 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'grand_total': grand_total,
     }
     return render(request, 'store/checkout.html', context)
+
+
+
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'dashboard/store.html', {'categories': categories})
