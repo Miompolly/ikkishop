@@ -66,7 +66,7 @@ def login(request):
             if all([user.is_admin, user.is_staff, user.is_active, user.is_superadmin]):
                 return redirect('admin:index')
             elif user.is_admin:
-                return redirect('store')
+                return redirect('seller_dashboard')
             else:
                 return redirect('home')
         else:

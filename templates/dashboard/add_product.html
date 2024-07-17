@@ -12,7 +12,7 @@
                         <div class="row">
                             <main class="col-md-9">
                                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                                    <h1 class="h2">Edit Product</h1>
+                                    <h1 class="h2">Add Product</h1>
                                     <div class="btn-toolbar mb-2 mb-md-0">
                                         <div class="btn-group me-2">
                                             <a href="{% url 'product_list' %}">
@@ -23,19 +23,19 @@
                                 </div>
                                 <article class="card">
                                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pl-3 pb-2 mb-3 border-bottom">
-                                        <form action="{% url 'edit_product' product.id %}" method="post" enctype="multipart/form-data" style="width:50%;">
+                                        <form action="{% url 'add_product' %}" method="post" enctype="multipart/form-data" style="width:50%;">
                                             {% csrf_token %}
                                             <div class="form-group">
                                                 <label for="productName">Product Name:</label>
-                                                <input type="text" class="form-control" id="productName" name="product_name" value="{{ product.product_name }}" placeholder="Enter product name" required>
+                                                <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="description">Description:</label>
-                                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description">{{ product.description }}</textarea>
+                                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description"></textarea>
                                             </div>
                                             <div class="form-group">
                                                 <label for="price">Price:</label>
-                                                <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" placeholder="Enter price" step="0.01" required>
+                                                <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" step="0.01" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="image">Upload Image:</label>
@@ -43,17 +43,17 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="stock">Stock:</label>
-                                                <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" placeholder="Enter stock quantity" required>
+                                                <input type="number" class="form-control" id="stock" name="stock" placeholder="Enter stock quantity" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="isAvailable">Is Available:</label>
-                                                <input type="checkbox" class="form-check-input" id="isAvailable" name="is_available" {% if product.is_available %} checked {% endif %}>
+                                                <input type="checkbox" class="form-check-input" id="isAvailable" name="is_available" checked>
                                             </div>
                                             <div class="form-group">
                                                 <label for="category">Category:</label>
                                                 <select class="form-control" id="category" name="category" required>
                                                     {% for category in categories %}
-                                                    <option value="{{ category.id }}" {% if product.category == category %} selected {% endif %}>{{ category.categoryname }}</option>
+                                                    <option value="{{ category.id }}">{{ category.categoryname }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>

@@ -11,51 +11,51 @@
 	<div class="card mx-auto" style="max-width:520px; margin-top:40px;">
       <article class="card-body">
 		 {% include 'includes/alerts.html' %}
-		<header class="mb-4"><h4 class="card-title">Iyandikishe</h4></header>
+		<header class="mb-4"><h4 class="card-title">Register</h4></header>
 		
 		<form action="{% url 'register' %}" method="POST">			
 			{% csrf_token %}	
 				<div class="form-row">
 					<div class="col form-group">
-						<label>Izina ryirikiristu</label>
+						<label>First Name</label>
 					  	{{form.first_name}}
 					</div> <!-- form-group end.// -->
 					<div class="col form-group">
-						<label>Izina Ry'ababyeyi</label>
+						<label>Last Name</label>
 						{{form.last_name}}
 					</div> <!-- form-group end.// -->
 				</div> <!-- form-row end.// -->
 			
 				<div class="form-row">
 					<div class="form-group col-md-6">
-						<label>Aderesi imeri</label>
+						<label>Email address</label>
 						{{form.email}}
-						<small class="form-text text-muted">Ntabwo tuzigera dusangira imeri yawe nabandi bose.</small>
+						<small class="form-text text-muted">We will never share your email with anyone else.</small>
 					</div> <!-- form-group end.// -->
 					<div class="form-group col-md-6">
-					  <label>Numero ya terefone</label>
+					  <label>Phone number</label>
 					  {{form.phone_number}}
 					</div> <!-- form-group end.// -->
 				</div> <!-- form-row.// -->
 				<div class="form-row">
 					<div class="form-group col-md-6">
-						<label>Andika ijambo ryibanga</label>
+						<label>Password</label>
 					    {{form.password}}
 					</div> <!-- form-group end.// --> 
 					<div class="form-group col-md-6">
-						<label>Subiramo ijambo ryibanga</label>
+						<label>Confim password</label>
 					    {{form.confirm_password}}
 					</div> <!-- form-group end.// -->  
 				</div>
 			    <div class="form-group">
-			        <button type="submit" class="btn btn-primary btn-block"> Iyandikishe  </button>
+			        <button type="submit" class="btn btn-primary btn-block"> Regsiter  </button>
 			    </div> <!-- form-group// -->      
 				{{ form.email.errors }}
 				{{ form.non_field_errors }}
 			</form>
 		</article><!-- card-body.// -->
     </div> <!-- card .// -->
-    <p class="text-center mt-4">Ugira konti? <a href="{% url 'login' %}">Injira</a></p>
+    <p class="text-center mt-4">Have an account? <a href="{% url 'login' %}">Login</a></p>
     <br><br>
 <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
 
