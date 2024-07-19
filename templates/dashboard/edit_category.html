@@ -12,52 +12,37 @@
                         <div class="row">
                             <main class="col-md-9">
                                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                                    <h1 class="h2">Edit Product</h1>
+                                    <h1 class="h2">Edit Category</h1>
                                     <div class="btn-toolbar mb-2 mb-md-0">
                                         <div class="btn-group me-2">
-                                            <a href="{% url 'product_list' %}">
-                                                <button class="btn btn-primary">View Products</button>
+                                            <a href="{% url 'category' %}">
+                                                <button class="btn btn-primary">View categories</button>
                                             </a>
                                         </div>
                                     </div>
                                 </div>
                                 <article class="card">
                                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pl-3 pb-2 mb-3 border-bottom">
-                                        <form action="{% url 'edit_product' product.id %}" method="post" enctype="multipart/form-data" style="width:50%;">
+                                        <form action="{% url 'update_category' category.id %}" method="post" enctype="multipart/form-data" style="width:50%;">
                                             {% csrf_token %}
                                             <div class="form-group">
-                                                <label for="productName">Product Name:</label>
-                                                <input type="text" class="form-control" id="productName" name="product_name" value="{{ product.product_name }}" placeholder="Enter product name" required>
+                                                <label for="categoryName">Category Name:</label>
+                                                <input type="text" class="form-control" id="categoryName" name="categoryname" value="{{ category.categoryname }}" placeholder="Enter category name" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="description">Description:</label>
-                                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description">{{ product.description }}</textarea>
+                                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter description" required>{{ category.description }}</textarea>
                                             </div>
                                             <div class="form-group">
-                                                <label for="price">Price:</label>
-                                                <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" placeholder="Enter price" step="0.01" required>
+                                                <label for="image">Current Image:</label><br>
+                                                {% if category.image %}
+                                                    <img src="{{ category.image.url }}" alt="{{ category.categoryname }}" style="max-width: 200px; max-height: 200px;">
+                                                {% else %}
+                                                    <p>No image uploaded</p>
+                                                {% endif %}
+                                                <input type="file" class="form-control-file mt-2" id="image" name="image">
                                             </div>
-                                            <div class="form-group">
-                                                <label for="image">Upload Image:</label>
-                                                <input type="file" class="form-control-file" id="image" name="image">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="stock">Stock:</label>
-                                                <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" placeholder="Enter stock quantity" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="isAvailable">Is Available:</label>
-                                                <input type="checkbox" class="form-check-input" id="isAvailable" name="is_available" {% if product.is_available %} checked {% endif %}>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="category">Category:</label>
-                                                <select class="form-control" id="category" name="category" required>
-                                                    {% for category in categories %}
-                                                    <option value="{{ category.id }}" {% if product.category == category %} selected {% endif %}>{{ category.categoryname }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary" name="saveproduct">Save</button>
+                                            <button type="submit" class="btn btn-primary" name="updatecategory">Update</button>
                                         </form>
                                     </div>
                                 </article>

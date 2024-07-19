@@ -1,13 +1,19 @@
 import datetime
-from django.shortcuts import render, redirect
+from django.contrib import messages
+import random
+import string
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import Order
+
+from store.models import Product
+from .models import Order, OrderProduct
 from carts.models import CartItem
 
 @login_required
 def place_order(request):
     if request.method == 'POST':
+        # Extracting form data
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -15,13 +21,11 @@ def place_order(request):
         district = request.POST.get('district')
         sector = request.POST.get('sector')
         cell = request.POST.get('cell')
+        grand_total = request.POST.get('grand_total')
+        tax = request.POST.get('tax')
+        ip = request.META.get('REMOTE_ADDR')
 
-        cart_items = CartItem.objects.filter(user=request.user)
-        total_price = sum(item.sub_total for item in cart_items)
-        tax = 0.1 * total_price
-        total_amount = total_price + tax
-
-        # Create the order
+        # Create a new Order
         order = Order(
             user=request.user,
             first_name=first_name,
@@ -31,26 +35,36 @@ def place_order(request):
             district=district,
             sector=sector,
             cell=cell,
-            order_total=total_amount,
+            order_total=grand_total,
             tax=tax,
-            ip=request.META.get('REMOTE_ADDR'),
-            is_ordered=True
+            ip=ip,
+            order_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         )
         order.save()
 
-       
-        yr = int(datetime.date.today().strftime('%Y'))
-        dt = int(datetime.date.today().strftime('%d'))
-        mt = int(datetime.date.today().strftime('%m'))
-        d = datetime.date(yr, mt, dt)
-        current_date = d.strftime("%Y%m%d")
-        order_number = current_date + str(order.id)
-        order.order_number = order_number
+        # Process each cart item and create OrderProduct
+        cart_items = request.session.get('cart', {})
+        for product_id, quantity in cart_items.items():
+            product = Product.objects.get(id=product_id)
+            order_product = OrderProduct(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price=product.price
+            )
+            order_product.save()
+        # Clear the cart session
+        request.session['cart'] = {}
+
+        messages.success(request, "Your order has been placed successfully!")
+        return redirect('store')  
+    return redirect('store')
+def update_order_status(request, order_id, new_status):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        order.status = new_status
         order.save()
-
-        
-        cart_items.delete()
-
-        return redirect(reverse('store'))
-
-    return render(request, 'store/cart.html')
+        return redirect('order_success', order_id=order.id)
+    
+def order_success(request):
+    return render(request, 'orders/order_success.html')

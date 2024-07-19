@@ -54,3 +54,7 @@ def update_category(request, category_id):
         form = CategoryForm(instance=category)
     return render(request, 'dashboard/edit_category.html', {'form': form, 'category': category})
 
+@login_required(login_url='login')
+def dashboard_order(request):
+    return render(request, 'dashboard/order.html')
+

@@ -1,9 +1,9 @@
 from django import forms
-from .models import Category
+from dashboard.models import Category
 
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['categoryname','slug','description', 'image']
+        fields = ['categoryname','description', 'image']
 
 
