@@ -10,4 +10,4 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderProduct)
 class OrderProductAdmin(admin.ModelAdmin):
-    list_display = ('order', 'product', 'quantity', 'price')
+    list_display = ('order','user', 'product', 'quantity', 'product_price','ordered')

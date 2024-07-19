@@ -8,7 +8,11 @@ from django.urls import reverse
 
 from store.models import Product
 from .models import Order, OrderProduct
-from carts.models import CartItem
+from carts.models import CartItem,Cart
+
+def payments(request):
+    return render(request, 'orders/payment.html')
+    
 
 @login_required
 def place_order(request):
@@ -24,7 +28,12 @@ def place_order(request):
         grand_total = request.POST.get('grand_total')
         tax = request.POST.get('tax')
         ip = request.META.get('REMOTE_ADDR')
+        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
+        # Retrieve cart items from session
+        cart = get_object_or_404(Cart)
+        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+        
         # Create a new Order
         order = Order(
             user=request.user,
@@ -38,27 +47,25 @@ def place_order(request):
             order_total=grand_total,
             tax=tax,
             ip=ip,
-            order_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            order_number=order_number,
+            is_ordered=False  
         )
         order.save()
 
-        # Process each cart item and create OrderProduct
-        cart_items = request.session.get('cart', {})
-        for product_id, quantity in cart_items.items():
-            product = Product.objects.get(id=product_id)
-            order_product = OrderProduct(
-                order=order,
-                product=product,
-                quantity=quantity,
-                price=product.price
-            )
-            order_product.save()
         # Clear the cart session
         request.session['cart'] = {}
 
-        messages.success(request, "Your order has been placed successfully!")
-        return redirect('store')  
-    return redirect('store')
+        # Pass context to the template
+        context = {
+            'order': order,
+            'cart_items': cart_items,
+            'total': grand_total,
+            'tax': tax,
+            'grand_total': grand_total,
+        }
+        return render(request, 'orders/payments.html', context)
+    else:
+        return redirect('checkout')
 def update_order_status(request, order_id, new_status):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
