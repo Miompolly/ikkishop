@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from carts.views import _cart_id
+from django.core.mail import send_mail
 
 from store.models import Product
 from .models import Order, OrderProduct, Payment
@@ -22,26 +23,128 @@ from carts.models import CartItem
 from store.models import Product
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
+from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 
+def send_payment_confirmation_email(user_email, order_number, order_total):
+    subject = 'Order Confirmation'
+    
+    # HTML email content with inline CSS
+    html_message = f"""
+   <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{subject}</title>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background-color: #f8f9fa;
+            }}
+            .container {{
+                width: 100%;
+                max-width: 600px;
+                margin: auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }}
+            .header {{
+                text-align: center;
+                margin-bottom: 20px;
+            }}
+            .header img {{
+                max-width: 100px;
+                height: auto;
+            }}
+            .content {{
+                font-size: 16px;
+                line-height: 1.5;
+                color: #333;
+            }}
+            .order-number {{
+                color: #007bff;  /* Blue color for order number */
+                font-weight: bold;
+            }}
+            .total-amount {{
+                font-weight: bold;
+            }}
+            .contact-info {{
+                margin-top: 20px;
+                font-size: 16px;
+                font-weight: bold;
+            }}
+            hr {{
+                border: 0;
+                height: 1px;
+                background: #e9ecef;
+                margin: 20px 0;
+            }}
+            .title {{
+                color: #28a745;  /* Green color for the title */
+                text-decoration: underline;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="https://private-user-images.githubusercontent.com/104558335/350699386-a81429a9-ed45-45c0-8d74-577c8f8bb38e.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjE0ODU3ODYsIm5iZiI6MTcyMTQ4NTQ4NiwicGF0aCI6Ii8xMDQ1NTgzMzUvMzUwNjk5Mzg2LWE4MTQyOWE5LWVkNDUtNDVjMC04ZDc0LTU3N2M4ZjhiYjM4ZS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNzIwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDcyMFQxNDI0NDZaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0wZWQ2ODg0MDUwMTBmYmM3ZWYxOWQzZWYyMGFjMzNiZWU3YjY2YzljOGRkMjkzNjI3M2Y1ZmExNjFiMzBiMGE2JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.iqK_0H37jNhgk4sj-Jysbeq9xWfB1tnF8TRtwReDlrQ" alt="Company Logo">
+            </div>
+            <div class="content">
+                <h1 class="title" style="text-align: center;">Order Confirmation</h1>
+                <p>
+                    Thank you for your purchase!<br><br>
+                    <strong>Order Number:</strong> <span class="order-number">{order_number}</span><br>
+                    <strong>Total Amount:</strong> <span class="total-amount">{order_total} Rwf</span><br><br>
+                    Your order has been received and is being processed.<br><br>
+                    <hr>
+                    <div class="contact-info">
+                        <strong>InaFood Contact:</strong> +250780036022
+                    </div>
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [user_email]
+    
+    email = EmailMessage(
+        subject,
+        html_message,
+        from_email,
+        recipient_list
+    )
+    email.content_subtype = 'html' 
+    email.send()
+
+@login_required
 def payments(request):
     if request.method == 'POST':
         body = json.loads(request.body)
-        order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+        order = Order.objects.get(user=request.user, is_ordered=False, order_number=body.get('orderID'))
 
         try:
             session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[{
                     'price_data': {
-                        'currency': 'Rwf',
+                        'currency': 'rwf',  # Use 'rwf' for Rwandan Francs
                         'product_data': {
-                        'name': 'Order {}'.format(order.order_number),
-                        'description': 'Total amount: {} Rwf'.format(order.order_total),                        },
-                        'unit_amount': int(order.order_total*100), 
+                            'name': f'Order {order.order_number}',
+                            'description': f'Total amount: {order.order_total} Rwf',
+                        },
+                        'unit_amount': int(order.order_total * 100),  # Convert to cents
                     },
                     'quantity': 1,
                 }],
@@ -50,7 +153,22 @@ def payments(request):
                 cancel_url=request.build_absolute_uri(reverse('order_cancel')),
             )
 
+            # Send payment confirmation email
+            send_payment_confirmation_email(
+                user_email=request.user.email,
+                order_number=order.order_number,
+                order_total=order.order_total
+            )
+
+            # Delete the cart after successful payment
+            cart = get_object_or_404(Cart, cart_id=_cart_id(request))
+            cart.delete()
+
             return JsonResponse({'id': session.id})
+        
+        except Order.DoesNotExist:
+            return JsonResponse({'error': 'Order does not exist'}, status=404)
+        
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=403)
 
@@ -160,8 +278,6 @@ def place_order(request):
             )
             order_product.save()
 
-        # Clear the cart session
-        cart.delete()
 
         # Pass context to the template
         context = {

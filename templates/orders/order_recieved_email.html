@@ -1,9 +1,47 @@
-{% autoescape off %}
-
-Hi {{user.first_name}},
-
-YOUR ORDER HAS BEEN RECIEVED
-
-Order Number: {{order.order_number}}
-
-{% endautoescape %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .alert {
+            padding: 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: .375rem;
+            border: 1px solid #c3e6cb;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: .25rem;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert">
+            <h4>Payment Successful!</h4>
+            <p>Thank you for your purchase. Your payment has been processed successfully.</p>
+            <p><strong>Order Number:</strong> {{ order_number }}</p>
+            <p><strong>Total Amount:</strong> {{ order_total }} Rwf</p>
+            <a href="{% url 'order_success' %}" class="btn-primary">View Order</a>
+        </div>
+    </div>
+</body>
+</html>
