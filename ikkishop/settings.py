@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'dashboard.context_processors.menu_links',
                 'carts.context_processors.counter',
+                'orders.context_processors.stripe_settings',
             ],
         },
     },
@@ -158,3 +159,6 @@ EMAIL_USE_TLS = True
 
 
 AUTH_USER_MODEL = 'accounts.Account'
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51OdRMbELJyO1YTqNUMsDWKzkaZIZjI3gjNJd1XiMUmLak27Nu0CmwSka7aSSHQu6gS6eqkU5dqfGaZUyQvUrhOTw00P7Qy2y47'
+STRIPE_SECRET_KEY = 'sk_test_51OdRMbELJyO1YTqNBJ6h14OPTDUCvd364qe4RZVrAVrFjB94GUDnNiwu1hP1E9KmcB9zyKjdcF9JDRiYICNQZsLv0052ZXCVdD'
