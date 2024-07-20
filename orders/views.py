@@ -6,6 +6,7 @@ import string
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from carts.views import _cart_id
 
 from store.models import Product
 from .models import Order, OrderProduct, Payment
@@ -36,11 +37,11 @@ def payments(request):
                 payment_method_types=['card'],
                 line_items=[{
                     'price_data': {
-                        'currency': 'usd',
+                        'currency': 'Rwf',
                         'product_data': {
-                            'name': 'Order {}'.format(order.order_number),
-                        },
-                        'unit_amount': int(order.order_total * 100),  # Stripe expects amount in cents
+                        'name': 'Order {}'.format(order.order_number),
+                        'description': 'Total amount: {} Rwf'.format(order.order_total),                        },
+                        'unit_amount': int(order.order_total*100), 
                     },
                     'quantity': 1,
                 }],
@@ -90,25 +91,6 @@ def handle_payment_success(session):
     order.payment = payment
     order.is_ordered = True
     order.save()
-
-    cart_items = CartItem.objects.filter(user=order.user)
-    for item in cart_items:
-        order_product = OrderProduct.objects.create(
-            order=order,
-            payment=payment,
-            user=order.user,
-            product=item.product,
-            quantity=item.quantity,
-            product_price=item.product.price,
-            ordered=True,
-        )
-        order_product.variations.set(item.variations.all())
-        order_product.save()
-
-        product = Product.objects.get(id=item.product.id)
-        product.stock -= item.quantity
-        product.save()
-
     CartItem.objects.filter(user=order.user).delete()
 
     # Send order received email to customer
@@ -145,7 +127,7 @@ def place_order(request):
         order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
         # Retrieve cart items from session
-        cart = get_object_or_404(Cart)
+        cart = get_object_or_404(Cart, cart_id=_cart_id(request))
         cart_items = CartItem.objects.filter(cart=cart, is_active=True)
         
         # Create a new Order
@@ -166,8 +148,20 @@ def place_order(request):
         )
         order.save()
 
+        # Create OrderProduct instances
+        for item in cart_items:
+            order_product = OrderProduct(
+                order=order,
+                user=request.user,
+                product=item.product,
+                quantity=item.quantity,
+                product_price=item.product.price,
+                ordered=True
+            )
+            order_product.save()
+
         # Clear the cart session
-        request.session['cart'] = {}
+        cart.delete()
 
         # Pass context to the template
         context = {
@@ -180,6 +174,7 @@ def place_order(request):
         return render(request, 'orders/payments.html', context)
     else:
         return redirect('checkout')
+
 def update_order_status(request, order_id, new_status):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
