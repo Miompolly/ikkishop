@@ -1,0 +1,19 @@
+{% extends 'dash_base.html' %}
+
+{% block content %}
+<section class="section-conten padding-y bg">
+    <div class="container">
+        <h2>Order Details</h2>
+        <p>Order Number: {{ order.order_number }}</p>
+        <p>Status: {{ order.status }}</p>
+        <p>Total: {{ order.order_total }}</p>
+        <p>Tax: {{ order.tax }}</p>
+        <p>Products:</p>
+        <ul>
+            {% for order_product in order.orderproduct_set.all %}
+                <li>{{ order_product.product.product_name }} - Quantity: {{ order_product.quantity }} - Price: {{ order_product.product_price }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endblock %}

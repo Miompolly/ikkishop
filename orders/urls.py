@@ -10,4 +10,6 @@ urlpatterns = [
     path('webhook/', views.stripe_webhook, name='stripe_webhook'),
     path('order-success/', views.order_success, name='order_success'),
     path('order-cancel/', views.order_cancel, name='order_cancel'),
+      path('order/update_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    
 ]

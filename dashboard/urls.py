@@ -10,4 +10,6 @@ urlpatterns = [
     path('category/<int:category_id>/', views.edit_category, name='edit_category'),
     path('category/<int:category_id>/update/', views.update_category, name='update_category'),
     path('order/', views.dashboard_order, name='dashboard_order'),    
+    path('order/<int:id>/', views.OrderDetailView.as_view(), name='order_detail'),
+   
 ]

@@ -1,6 +1,9 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse
+from django.views.generic import DetailView
 
+
+from orders.models import Order, OrderProduct
 from store.models import Product
 from .models import Category
 from .forms import CategoryForm
@@ -56,5 +59,19 @@ def update_category(request, category_id):
 
 @login_required(login_url='login')
 def dashboard_order(request):
-    return render(request, 'dashboard/order.html')
+    user = request.user    
+    # Get all OrderProduct instances where the product's user is the logged-in user
+    order_products = OrderProduct.objects.filter(product__user=user)    
+    # Extract distinct orders from the filtered order products
+    orders = Order.objects.filter(orderproduct__in=order_products).distinct()
+    return render(request, 'dashboard/order.html',{'orders': orders, 'order_products': order_products})
+
+class OrderDetailView(DetailView):
+    model = Order
+    template_name = 'dashboard/order_detail.html'
+    context_object_name = 'order'
+
+    def get_object(self):
+        return get_object_or_404(Order, id=self.kwargs['id'])
+    
 

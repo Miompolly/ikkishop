@@ -10,7 +10,4 @@ class OrderForm(forms.ModelForm):
         model = Payment
         fields = ['first_name', 'last_name', 'email', 'phone','district', 'sector', 'cell','total_price','tax','amount']
 
-class OrderStatusForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ['status']
+

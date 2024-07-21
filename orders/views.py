@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from carts.views import _cart_id
 from django.core.mail import send_mail
+from orders.form import OrderStatusForm
 
 from store.models import Product
 from .models import Order, OrderProduct, Payment
@@ -326,3 +327,124 @@ def order_complete(request):
         return render(request, 'orders/order_complete.html', context)
     except (Payment.DoesNotExist, Order.DoesNotExist):
         return redirect('home')
+    
+@login_required
+def update_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    user = request.user    
+    # Get all OrderProduct instances where the product's user is the logged-in user
+    order_products = OrderProduct.objects.filter(product__user=user)    
+    # Extract distinct orders from the filtered order products
+    orders = Order.objects.filter(orderproduct__in=order_products).distinct()
+    
+    if request.method == 'POST':
+        form = OrderStatusForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            
+            # Prepare the email content
+            subject = 'Order Status Updated'
+            html_message = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>{subject}</title>
+                <style>
+                    body {{
+                        margin: 0;
+                        padding: 0;
+                        font-family: Arial, sans-serif;
+                        background-color: #f8f9fa;
+                    }}
+                    .container {{
+                        width: 100%;
+                        max-width: 600px;
+                        margin: auto;
+                        padding: 20px;
+                        background-color: #ffffff;
+                        border-radius: 5px;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }}
+                    .header {{
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }}
+                    .header img {{
+                        max-width: 100px;
+                        height: auto;
+                    }}
+                    .content {{
+                        font-size: 16px;
+                        line-height: 1.5;
+                        color: #333;
+                    }}
+                    .order-number {{
+                        color: #007bff;  /* Blue color for order number */
+                        font-weight: bold;
+                    }}
+                    .status {{
+                        color: #28a745;  /* Green color for status */
+                        font-weight: bold;
+                    }}
+                    .contact-info {{
+                        margin-top: 20px;
+                        font-size: 16px;
+                        font-weight: bold;
+                    }}
+                    hr {{
+                        border: 0;
+                        height: 1px;
+                        background: #e9ecef;
+                        margin: 20px 0;
+                    }}
+                    .title {{
+                        color: #007bff;  /* Blue color for the title */
+                        text-decoration: underline;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <img src="https://private-user-images.githubusercontent.com/104558335/350699386-a81429a9-ed45-45c0-8d74-577c8f8bb38e.png" alt="Company Logo">
+                    </div>
+                    <div class="content">
+                        <h1 class="title" style="text-align: center;">Order Status Updated</h1>
+                        <p>
+                            Your order status has been updated.<br><br>
+                            <strong>Order Number:</strong> <span class="order-number">{order.order_number}</span><br>
+                            <strong>New Status:</strong> <span class="status">{order.status}</span><br><br>
+                            Thank you for your attention.<br><br>
+                            <hr>
+                            <div class="contact-info">
+                                <strong>InaFood Contact:</strong> +250780036022
+                            </div>
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [order.email]  # Use the buyer's email from the order
+            
+            email = EmailMessage(
+                subject,
+                html_message,
+                from_email,
+                recipient_list
+            )
+            email.content_subtype = 'html'  # Specify the email type as HTML
+            email.send()
+
+            # Add success message
+            messages.success(request, 'Order status updated and email notification sent successfully.')
+
+            return render(request, 'dashboard/order.html', {'orders': orders, 'order_products': order_products})
+    else:
+        form = OrderStatusForm(instance=order)
+    
+    return render(request, 'dashboard/update_order_status.html', {'form': form, 'order': order})
