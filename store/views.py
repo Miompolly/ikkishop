@@ -125,6 +125,8 @@ def delete_product(request, product_id):
     product.delete()
     return redirect('product_list')
 
+@login_required
 def product_list(request):
-    products = Product.objects.all()  
+    user = request.user
+    products = Product.objects.filter(user=user)
     return render(request, 'dashboard/product_list.html', {'products': products})
