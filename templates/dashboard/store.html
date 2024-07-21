@@ -14,14 +14,9 @@
                             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                                 <h1 class="h2">Our Categories</h1>
                                 <div class="btn-toolbar mb-2 mb-md-0">
-                                    <div class="btn-group me-2">
-                                        <button class="btn btn-info buttons-print ml-2"><i class="fas fa-print"></i> Print</button>
-                                        <button class="btn btn-info buttons-excel ml-2 btn-success"><i class="fas fa-file-excel"></i> Excel</button>
-                                        <button class="btn btn-info buttons-pdf ml-2 btn-danger"><i class="fas fa-file-pdf"></i> PDF</button>
-                                        
-                                    </div>
+                                    
                                     <div class="btn-group me-2 ml-2">
-                                        <a href="{% url 'add_category' %}"><button class="btn btn-primary ">Add +</button></a>
+                                        <a href="{% url 'add_category' %}"><button class="btn btn-primary">Add +</button></a>
                                     </div>
                                 </div>
                             </div>
@@ -67,12 +62,38 @@
     </div>
 </section>
 
+<!-- DataTables and Extensions -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.colVis.min.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
         $('#categoryTable').DataTable({
             dom: 'Bfrtip',
             buttons: [
-                'copy', 'csv', 'excel', 'pdf', 'print'
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                    className: 'btn btn-outline-primary'
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    className: 'btn btn-outline-success'
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    className: 'btn btn-outline-danger'
+                }
             ]
         });
     });

@@ -1,6 +1,9 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse
 from django.views.generic import DetailView
+from django.contrib import messages
+from django.shortcuts import render
+
 
 
 from orders.models import Order, OrderProduct
@@ -10,9 +13,7 @@ from .forms import CategoryForm
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-@login_required(login_url='login')
-def seller_dashboard(request):
-    return render(request, 'dashboard/dashboard.html')
+
 @login_required(login_url='login')
 def category(request):
     categories = Category.objects.all()
@@ -28,6 +29,7 @@ def add_category(request):
         form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Category added successfully.')
             return redirect('category')
     else:
         form = CategoryForm()
@@ -38,6 +40,7 @@ def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     if request.method == 'POST':
         category.delete()
+        messages.success(request, 'Category deleted successfully.')
         return redirect('category')
     return render(request, 'dashboard/confirm_delete.html', {'category': category})
 
@@ -53,6 +56,7 @@ def update_category(request, category_id):
         form = CategoryForm(request.POST, request.FILES, instance=category)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Category updated successfully.')
             return redirect('category')
         form = CategoryForm(instance=category)
     return render(request, 'dashboard/edit_category.html', {'form': form, 'category': category})
@@ -73,5 +77,33 @@ class OrderDetailView(DetailView):
 
     def get_object(self):
         return get_object_or_404(Order, id=self.kwargs['id'])
+    
+
+
+@login_required(login_url='login')
+def seller_dashboard(request):
+    # Count the total number of orders
+    total_orders = Order.objects.filter(user=request.user).count()
+    
+    # Count orders based on their status
+    completed_orders = Order.objects.filter(user=request.user, status='completed').count()
+    cancelled_orders = Order.objects.filter(user=request.user, status='cancelled').count()
+    shipped_orders = Order.objects.filter(user=request.user, status='shipped').count()
+    new_orders = Order.objects.filter(user=request.user, status='pending').count()
+    recent_orders = Order.objects.filter(user=request.user).order_by('-id')[:10]
+    
+  
+    context = {
+        'total_orders': total_orders,
+        'completed_orders': completed_orders,
+        'cancelled_orders': cancelled_orders,
+        'shipped_orders': shipped_orders,
+        'new_orders': new_orders,
+        'recent_orders': recent_orders,
+
+      
+    }
+    
+    return render(request, 'dashboard/dashboard.html', context)
     
 
