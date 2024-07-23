@@ -1,51 +1,96 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-<section class="section-conten padding-y bg">
-
-{% include 'includes/alerts.html' %}
-<div class="container">
-	<div class="row">
-	{% include 'includes/dashboard_sidebar.html' %}
-	<main class="col-md-9">
-		<article class="card">
-		<header class="card-header">
-			<strong class="d-inline-block mr-3">Logged in as:</strong>
-			<span>{{user.full_name}}</span>
-		</header>
-		<div class="card-body">
-			<div class="row">
-
-			<div class="col-md-6">
-				<div class="card" style="text-align:center;">
-					<div class="card-body">
-						<h5 class="card-title">Total Orders</h5>
-						<h4></h4>
-						<a href="#">View Orders</a>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="card" style="text-align:center;">
-					<div class="card-body">
-						<img src="{{userprofile.profile_picture.url}}" alt="User Profile Picture" width="50" height="50" style="border-radius:50%;">
-						<p class="mb-0">{{user.email}}</p>
-						<p>{{user.phone_number}}</p>
-					</div>
-				</div>
-			</div>
-
-			</div> <!-- row.// -->
-		</div> <!-- card-body .// -->
-
-		</article> <!-- order-group.// -->
-	</main>
-</div> <!-- row.// -->
-</div>
-
-
+<section class="section-content padding-y bg">
+    {% include 'includes/alerts.html' %}
+    <div class="container">
+        <div class="row">
+            {% include 'includes/dashboard_sidebar.html' %}
+            <main class="col-md-9">
+                <article class="card">
+                    <header class="card-header">
+                        <strong class="d-inline-block mr-3">Logged in as:</strong>
+                        <span>{{ user.first_name }}</span> <span class="ml-2">{{ user.last_name }}</span>
+                    </header>
+                    <div class="card-body">
+                        <div class="table-responsive pl-3 pr-3 pt-3">
+                            <!-- Data Table -->
+                            <table id="categoryTable" class="table table-bordered table-striped table-lg">
+                                <thead>
+                                    <tr>
+                                        <th>Order Number</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                        <tr>
+                                            <td>{{ order.order_number }}</td>
+                                            <td>{{ order.first_name }}</td>
+                                            <td>{{ order.last_name }}</td>
+                                            <td>{{ order.email }}</td>
+                                            <td>{{ order.order_total }}</td>
+                                            <td>{{ order.get_status_display }}</td>
+                                            <td>
+                                                <a href="{% url 'order_detail' order.id %}" class="btn btn-info me-2">View</a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="7">No orders found</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div> <!-- table-responsive .end// -->
+                    </div> <!-- card-body .// -->
+                </article> <!-- order-group.// -->
+            </main>
+        </div> <!-- row.// -->
+    </div>
 </section>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.colVis.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#categoryTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                    className: 'btn btn-outline-primary'
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    className: 'btn btn-outline-success'
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    className: 'btn btn-outline-danger'
+                }
+            ]
+        });
+    });
+</script>
+
 
 {% endblock %}

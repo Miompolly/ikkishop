@@ -35,6 +35,14 @@
                                 <button type="submit" class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
                             {% endif %}
                         {% endif %}
+                        
+                        <!-- WhatsApp Chat Button -->
+                        {% if single_product.get_seller_phone_number %}
+                            <a href="https://wa.me/{{ single_product.get_seller_phone_number }}" class="btn btn-success" target="_blank">
+                                <i class="fab fa-whatsapp"></i> <span class="text">Chat with Seller</span>
+                            </a>
+                        {% endif %}
+                        
                     </article> <!-- product-info-aside .// -->
                 </form>
             </main> <!-- col.// -->

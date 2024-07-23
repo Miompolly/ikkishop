@@ -8,6 +8,8 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
+from orders.models import Order, OrderProduct
+
 from .forms import RegistrationForm
 from .models import Account
 from .tokens import default_token_generator
@@ -98,11 +100,15 @@ def activate(request, uidb64, token):
         return redirect('register')
 
 
-@login_required(login_url = 'login')
+
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
-
-
+    user = request.user 
+   
+    order_products = OrderProduct.objects.filter(user=user)
+    
+    orders = Order.objects.filter(orderproduct__in=order_products).distinct()
+    
+    return render(request, 'accounts/dashboard.html', {'orders': orders})
 
 def forgotPassword(request):
     if request.method == 'POST':
