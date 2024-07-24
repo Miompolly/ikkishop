@@ -1,19 +1,69 @@
 {% extends 'dash_base.html' %}
 
 {% block content %}
-<section class="section-conten padding-y bg">
-    <div class="container">
-        <h2>Order Details</h2>
-        <p>Order Number: {{ order.order_number }}</p>
-        <p>Status: {{ order.status }}</p>
-        <p>Total: {{ order.order_total }}</p>
-        <p>Tax: {{ order.tax }}</p>
-        <p>Products:</p>
-        <ul>
-            {% for order_product in order.orderproduct_set.all %}
-                <li>{{ order_product.product.product_name }} - Quantity: {{ order_product.quantity }} - Price: {{ order_product.product_price }}</li>
-            {% endfor %}
-        </ul>
+<section class="section-content padding-y bg">
+    <div class="container text-center">
+
+        <!-- Card with Background Image -->
+        <div class="card bg-dark text-white mb-4 mx-auto" style="position: relative; overflow: hidden; max-width: 600px;">
+            <!-- Background Image -->
+            <img src="path/to/your/image.jpg" class="card-img" alt="Background Image">
+            <div class="card-img-overlay">
+                <h2 class="mb-4">Order Details</h2>
+                <hr style="color:white;">
+                <div id="print-section" class="mb-3">
+                    <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+                    
+                    <ul class="list-unstyled">
+                        {% for order_product in order.orderproduct_set.all %}
+                            <li>
+                                <p><strong>Product:</strong> {{ order_product.product.product_name }}</p>
+                                <p><strong>Quantity:</strong> {{ order_product.quantity }} kg</p>
+                                <p><strong>Price:</strong> {{ order_product.product_price }} Rwf</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <p><strong>Tax:</strong> {{ order.tax }} Rwf</p>
+                    <p><strong>Total:</strong> {{ order.order_total }} Rwf</p>
+                    <p><strong>Status:</strong> {{ order.status }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Button -->
+        <div class="text-center">
+            <button class="btn btn-primary" onclick="printOrderDetails()">Print Order Details</button>
+        </div>
     </div>
 </section>
+
+<script>
+function printOrderDetails() {
+    var printContent = document.getElementById('print-section').innerHTML;
+    var originalContent = document.body.innerHTML;
+    
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+}
+</script>
+
+<style>
+.card-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.card-img-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: dark overlay for better text readability */
+    position: relative;
+    z-index: 1;
+}
+</style>
 {% endblock %}
