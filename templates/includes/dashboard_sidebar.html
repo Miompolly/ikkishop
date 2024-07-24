@@ -4,7 +4,7 @@
     
     <a class="list-group-item"  href="{% url 'dashboard' %}"> My Orders </a>
     <a class="list-group-item" href="{% url 'logout' %}"> Edit Profile </a>
-    <a class="list-group-item" href="{% url 'logout' %}"> Change Password </a> 
+    <a class="list-group-item {% if '/change_password/' in request.path %}active{% endif %}" href="{% url 'change_password' %}"> Change Password </a>
   </ul>
   <br>
   
