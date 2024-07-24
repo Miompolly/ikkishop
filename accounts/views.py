@@ -7,6 +7,13 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import RegistrationForm, UserForm, UserProfileForm
+from .models import Account, UserProfile
+from orders.models import Order, OrderProduct
+from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from orders.models import Order, OrderProduct
 
@@ -102,13 +109,12 @@ def activate(request, uidb64, token):
 
 
 def dashboard(request):
-    user = request.user 
-   
-    order_products = OrderProduct.objects.filter(user=user)
-    
-    orders = Order.objects.filter(orderproduct__in=order_products).distinct()
-    
-    return render(request, 'accounts/dashboard.html', {'orders': orders})
+    user = request.user    
+    if user.is_authenticated:
+        order_products = OrderProduct.objects.filter(user=user)
+        return render(request, 'accounts/dashboard.html', {'order_products': order_products})
+    else:
+        return redirect('login')
 
 def forgotPassword(request):
     if request.method == 'POST':
@@ -194,3 +200,29 @@ def change_password(request):
             messages.error(request, 'Password does not match!')
             return redirect('change_password')
     return render(request, 'accounts/change_password.html')
+
+@login_required(login_url='login')
+def edit_profile(request):
+    user = request.user
+    userprofile, created = UserProfile.objects.get_or_create(user=user)
+    
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated.')
+            return redirect('edit_profile')
+    else:
+        user_form = UserForm(instance=user)
+        profile_form = UserProfileForm(instance=userprofile)
+    
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+    return render(request, 'accounts/edit_profile.html', context)
+
