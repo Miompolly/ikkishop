@@ -267,20 +267,27 @@ def place_order(request):
         )
         order.save()
 
-        # Create OrderProduct instances
         for item in cart_items:
-            order_product = OrderProduct(
-                order=order,
-                user=request.user,
-                product=item.product,
-                quantity=item.quantity,
-                product_price=item.product.price,
-                ordered=True
-            )
-            order_product.save()
+            if item.product.stock >= item.quantity:
+                order_product = OrderProduct(
+                    order=order,
+                    user=request.user,
+                    product=item.product,
+                    quantity=item.quantity,
+                    product_price=item.product.price,
+                    ordered=True
+                )
+                order_product.save()
+                
+                # Reduce product stock
+                item.product.stock -= item.quantity
+                item.product.save()
+            else:
+                # Handle insufficient quantity case (optional)
+                messages.error(request, f'Not enough stock for {item.product.product_name}')
+                return redirect('cart')  # Redirect to cart or handle as needed
 
-
-        # Pass context to the template
+        
         context = {
             'order': order,
             'cart_items': cart_items,
@@ -448,3 +455,5 @@ def update_order_status(request, order_id):
         form = OrderStatusForm(instance=order)
     
     return render(request, 'dashboard/update_order_status.html', {'form': form, 'order': order})
+
+

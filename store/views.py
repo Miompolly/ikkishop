@@ -6,7 +6,7 @@ from carts.models import CartItem
 from carts.views import _cart_id
 from dashboard.models import Category
 from .models import Product
-from store.forms import ProductForm # type: ignore
+from store.forms import ProductForm
 
 def store(request, category_slug=None):
     categories = None
@@ -34,23 +34,19 @@ def store(request, category_slug=None):
     }
 
     return render(request, 'store/store.html', context)
+
 def product_detail(request, category_slug, product_slug):
-
     try:
-
-        single_product=Product.objects.get(category__slug=category_slug,slug=product_slug)
-        in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
-
+        single_product = Product.objects.get(category__slug=category_slug, slug=product_slug)
+        in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=single_product).exists()
     except Exception as e:
         raise e
 
-    context={
-        'single_product':single_product,
-        'in_cart':in_cart,
+    context = {
+        'single_product': single_product,
+        'in_cart': in_cart,
     }   
-    return render(request, 'store/product_detail.html',context)
-
-
+    return render(request, 'store/product_detail.html', context)
 
 def search(request):
     products = None  
@@ -66,35 +62,7 @@ def search(request):
 
 @login_required
 def add_product(request):
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            product = form.save(commit=False)
-            product.user = request.user  # Set the user reference
-            product.save()
-            return redirect('product_list')  # Redirect to the product list or another view
-    else:
-        form = ProductForm()
-    return render(request, 'dashboard/add_product.html', {'form': form})
-
-@login_required
-def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('product_list')  # Redirect to the product list or another view
-    else:
-        form = ProductForm(instance=product)
-    return render(request, 'dashboard/edit_product.html', {'form': form})
-
-# In views.py
-
-
-@login_required
-def add_product(request):
-    categories = Category.objects.all() 
+    categories = Category.objects.all()
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
@@ -106,18 +74,19 @@ def add_product(request):
         form = ProductForm()
 
     return render(request, 'dashboard/add_product.html', {'form': form, 'categories': categories})
+
 @login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    categories = Category.objects.all()  
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('product_list')  
+            return redirect('product_list')
     else:
         form = ProductForm(instance=product)
-    return render(request, 'dashboard/edit_product.html', {'form': form, 'product': product})
-
+    return render(request, 'dashboard/edit_product.html', {'form': form, 'product': product, 'categories': categories})
 
 @login_required
 def delete_product(request, product_id):

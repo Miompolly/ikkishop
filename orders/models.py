@@ -45,6 +45,8 @@ class Order(models.Model):
     is_ordered = models.BooleanField(default=False)
     order_number = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.order_number or str(self.id)

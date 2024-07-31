@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.db import models
 from dashboard.models import Category
 from ikkishop import settings
+from django.utils.text import slugify
 
 
 class Product(models.Model):
@@ -15,6 +16,10 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.product_name)
+        super().save(*args, **kwargs)
 
     def get_url(self):
         return reverse('product_detail',args=[self.category.slug,self.slug])

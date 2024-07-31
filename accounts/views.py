@@ -42,7 +42,7 @@ def register(request):
             user.phone_number = phone_number
             user.save() 
 
-            # Send activation email
+            
             current_site = get_current_site(request)
             mail_subject = 'Please activate your account'
             message = render_to_string('accounts/account_verification_email.html', {
@@ -72,9 +72,9 @@ def login(request):
 
         if user is not None:
             auth.login(request, user)
-            if all([user.is_admin, user.is_staff, user.is_active, user.is_superadmin]):
+            if all([user.is_seller, user.is_staff, user.is_active, user.is_superadmin]):
                 return redirect('admin:index')
-            elif user.is_admin:
+            elif user.is_seller:
                 return redirect('seller_dashboard')
             else:
                 return redirect('home')
@@ -109,10 +109,17 @@ def activate(request, uidb64, token):
 
 
 def dashboard(request):
-    user = request.user    
+    user = request.user
     if user.is_authenticated:
+        orders = Order.objects.filter(user=user)
         order_products = OrderProduct.objects.filter(user=user)
-        return render(request, 'accounts/dashboard.html', {'order_products': order_products})
+
+        context = {
+            'orders': orders,
+            'order_products': order_products
+        }
+        
+        return render(request, 'accounts/dashboard.html', context)
     else:
         return redirect('login')
 
@@ -190,7 +197,7 @@ def change_password(request):
             if success:
                 user.set_password(new_password)
                 user.save()
-                # auth.logout(request)
+                
                 messages.success(request, 'Password updated successfully.')
                 return redirect('change_password')
             else:

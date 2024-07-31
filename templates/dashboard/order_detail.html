@@ -3,35 +3,61 @@
 {% block content %}
 <section class="section-content padding-y bg">
     <div class="container text-center">
-
-        <!-- Card with Background Image -->
         <div class="card bg-dark text-white mb-4 mx-auto" style="position: relative; overflow: hidden; max-width: 600px;">
-            <!-- Background Image -->
             <img src="path/to/your/image.jpg" class="card-img" alt="Background Image">
             <div class="card-img-overlay">
-                <h2 class="mb-4">Order Details</h2>
-                <hr style="color:white;">
+                
                 <div id="print-section" class="mb-3">
-                    <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+                    <h2 class="mb-4">Order Details</h2>
+                <hr style="color:white;">
+                    <table class="table table-dark table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>Order Number</th>
+                                <td>{{ order.order_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>Tax</th>
+                                <td>{{ order.tax }} Rwf</td>
+                            </tr>
+                            <tr>
+                                <th>Total</th>
+                                <td>{{ order.order_total }} Rwf</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>{{ order.status }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     
+                    <h3 class="mb-3">Products</h3>
                     <ul class="list-unstyled">
                         {% for order_product in order.orderproduct_set.all %}
                             <li>
-                                <p><strong>Product:</strong> {{ order_product.product.product_name }}</p>
-                                <p><strong>Quantity:</strong> {{ order_product.quantity }} kg</p>
-                                <p><strong>Price:</strong> {{ order_product.product_price }} Rwf</p>
+                                <table class="table table-dark table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Product</th>
+                                            <td>{{ order_product.product.product_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Quantity</th>
+                                            <td>{{ order_product.quantity }} kg</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Price</th>
+                                            <td>{{ order_product.product_price }} Rwf</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </li>
                         {% endfor %}
                     </ul>
-
-                    <p><strong>Tax:</strong> {{ order.tax }} Rwf</p>
-                    <p><strong>Total:</strong> {{ order.order_total }} Rwf</p>
-                    <p><strong>Status:</strong> {{ order.status }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Print Button -->
         <div class="text-center">
             <button class="btn btn-primary" onclick="printOrderDetails()">Print Order Details</button>
         </div>
@@ -61,7 +87,7 @@ function printOrderDetails() {
 }
 
 .card-img-overlay {
-    background-color: rgba(0, 0, 0, 0.5); /* Optional: dark overlay for better text readability */
+    background-color: rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 1;
 }

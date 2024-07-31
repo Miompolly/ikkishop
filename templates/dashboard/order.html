@@ -13,7 +13,6 @@
                         <main class="col-md-12">
                             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                                 <h1 class="h2">Orders</h1>
-                                
                             </div>
                             <article class="card">
                                 <div class="table-responsive pl-3 pr-3 pt-3">
@@ -22,10 +21,10 @@
                                         <thead>
                                             <tr>
                                                 <th>Order Number</th>
-                                                <th>Product ID</th>
-                                                <th>Product Name</th>
                                                 <th>Quantity</th>
                                                 <th>Price</th>
+                                                <th>Tax</th>
+                                                <th>Total Price </th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
@@ -36,10 +35,10 @@
                                                     {% if order_product.product.user == user %}
                                                     <tr>
                                                         <td>{{ order.order_number }}</td>
-                                                        <td>{{ order_product.product.id }}</td>
-                                                        <td>{{ order_product.product.product_name }}</td>
                                                         <td>{{ order_product.quantity }}</td>
                                                         <td>{{ order_product.product_price }}</td>
+                                                        <td>{{ order.tax }}</td>
+                                                        <td>{{ order.order_total }}</td>
                                                         <td>{{ order.status }}</td>
                                                         <td>
                                                             <a href="{% url 'order_detail' order.id %}" class="btn btn-info me-2">View</a>

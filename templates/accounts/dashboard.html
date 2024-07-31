@@ -15,15 +15,14 @@
                     </header>
                     <div class="card-body">
                         <div class="table-responsive pl-3 pr-3 pt-3">
-                            <!-- Data Table -->
-                            <table id="categoryTable" class="table table-bordered table-striped table-lg">
+                            <!-- Data Table for Orders -->
+                            <table id="orderTable" class="table table-bordered table-striped table-lg">
                                 <thead>
                                     <tr>
                                         <th>Order Number</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
                                         <th>Email</th>
-                                        <th>Total Amount</th>
+                                         <th>Total Amount</th>
+                                        <th>Tax</th>
                                         <th>Status</th>
                                         <th>View</th>
                                     </tr>
@@ -32,10 +31,9 @@
                                     {% for order in orders %}
                                         <tr>
                                             <td>{{ order.order_number }}</td>
-                                            <td>{{ order.first_name }}</td>
-                                            <td>{{ order.last_name }}</td>
-                                            <td>{{ order.email }}</td>
+                                            <td>{{ order.email }}</td>                                          
                                             <td>{{ order.order_total }}</td>
+                                            <td>{{ order.tax }}</td>
                                             <td>{{ order.get_status_display }}</td>
                                             <td>
                                                 <a href="{% url 'order_detail' order.id %}" class="btn btn-info me-2">View</a>
@@ -43,11 +41,14 @@
                                         </tr>
                                     {% empty %}
                                         <tr>
-                                            <td colspan="7">No orders found</td>
+                                            <td colspan="10">No orders found</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+
+                            <!-- Data Table for Order Products -->
+                       
                         </div> <!-- table-responsive .end// -->
                     </div> <!-- card-body .// -->
                 </article> <!-- order-group.// -->
@@ -56,6 +57,7 @@
     </div>
 </section>
 
+<!-- DataTables CSS and JS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -69,7 +71,28 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#categoryTable').DataTable({
+        $('#orderTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                    className: 'btn btn-outline-primary'
+                },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    className: 'btn btn-outline-success'
+                },
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    className: 'btn btn-outline-danger'
+                }
+            ]
+        });
+
+        $('#orderProductTable').DataTable({
             dom: 'Bfrtip',
             buttons: [
                 {
@@ -91,6 +114,5 @@
         });
     });
 </script>
-
 
 {% endblock %}
