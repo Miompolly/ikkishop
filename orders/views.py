@@ -134,6 +134,7 @@ def payments(request):
     if request.method == 'POST':
         body = json.loads(request.body)
         order = Order.objects.get(user=request.user, is_ordered=False, order_number=body.get('orderID'))
+        
 
         try:
             session = stripe.checkout.Session.create(
@@ -240,8 +241,8 @@ def place_order(request):
         district = request.POST.get('district')
         sector = request.POST.get('sector')
         cell = request.POST.get('cell')
-        grand_total = request.POST.get('grand_total')
-        tax = request.POST.get('tax')
+        grand_total = float(request.POST.get('grand_total', 0))  # Convert to float
+        tax = float(request.POST.get('tax', 0))  # Convert to float
         ip = request.META.get('REMOTE_ADDR')
         order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
 
@@ -266,7 +267,10 @@ def place_order(request):
             is_ordered=False  
         )
         order.save()
-
+        
+        # Calculate total price without tax
+        totalprice = grand_total - tax
+        
         for item in cart_items:
             if item.product.stock >= item.quantity:
                 order_product = OrderProduct(
@@ -287,18 +291,16 @@ def place_order(request):
                 messages.error(request, f'Not enough stock for {item.product.product_name}')
                 return redirect('cart')  # Redirect to cart or handle as needed
 
-        
         context = {
             'order': order,
             'cart_items': cart_items,
-            'total': grand_total,
+            'totalprice': totalprice,
             'tax': tax,
             'grand_total': grand_total,
         }
         return render(request, 'orders/payments.html', context)
     else:
         return redirect('checkout')
-
 def update_order_status(request, order_id, new_status):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
